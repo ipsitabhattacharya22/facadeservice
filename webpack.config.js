@@ -6,6 +6,7 @@ const nodeExternals = require('webpack-node-externals');
 const webpack = require('webpack');
 
 module.exports = {
+  mode: 'development',
   entry: './src/index.js',
   externals: [nodeExternals()],
   output: {
@@ -13,7 +14,10 @@ module.exports = {
     publicPath: 'dist/',
     path: path.resolve(__dirname, 'dist'),
     library: '',
-    libraryTarget: 'commonjs'
+    libraryTarget: 'umd',
+    umdNamedDefine: true,
+    globalObject: `(typeof self !== 'undefined' ? self : this)`,
+    chunkFilename: '[name].js'
   },
   plugins: [new CleanWebpackPlugin()],
   module: {

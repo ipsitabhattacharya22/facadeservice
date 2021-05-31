@@ -3,6 +3,7 @@ import BoomerangHeader from './index.js'
 import { withKnobs, text } from '@storybook/addon-knobs'
 import { Dashboard16, Dashboard24, Notification24 } from '@carbon/icons-react'
 export default { title: 'IAW App Header', decorators: [withKnobs]}
+import headerLogo from "../../assets/images/Agent-assist-logo.png";
 
 
 export const boomerangHeader = (props) => {
@@ -31,6 +32,18 @@ export const boomerangHeader = (props) => {
     }
   ]
 
+  const sideNavItems = [
+    {
+      label: "Activities",
+      pathName: "https://www.google.com"
+    },
+    {
+      label: "Document Management",
+      pathName: "#",
+      renderIcon: Dashboard24
+    }
+  ]
+
   const onIconClick = (e, iconName) => {
     console.log("Clicked icon = ", iconName);
     if(iconName === 'Dashboard') {
@@ -38,5 +51,32 @@ export const boomerangHeader = (props) => {
     }
   }
 
-  return <BoomerangHeader customHeaderStyle={customHeaderStyle} componentDidMount={componentDidMount} productName="Corpus Curator" headerConfig={headerConfig} userDetail={userDetail} bmrgCustomIcons={bmrgCustomIcons} onIconClick={onIconClick}/>
+  const navigation = [
+    {
+      name: 'Menu 1',
+      url: 'https://www.google.com'
+    },
+    {
+      name: 'Menu 2',
+      url: 'https://www.facebook.com'
+    }
+  ]
+
+  return <BoomerangHeader 
+  customHeaderStyle={customHeaderStyle} 
+  componentDidMount={componentDidMount} 
+  productName="Automation Platform" 
+  headerConfig={headerConfig} 
+  userDetail={userDetail} 
+  bmrgCustomIcons={bmrgCustomIcons} 
+  onIconClick={onIconClick} 
+  hasHeaderLogo={true}
+  headerLogo={headerLogo}
+  headerText="Agent Assist"
+  hasSideNav={true}
+  isSideNavOpen={true}
+  logoLink="#"
+  sideNavItems={sideNavItems}
+  navigation={navigation}
+  />
 }

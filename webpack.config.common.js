@@ -8,7 +8,15 @@ const moduleObj = {
     },
     {
       test: /\.css$/,
-      loader: ['style-loader', 'css-loader']
+      use: [
+        'style-loader',
+        {
+          loader: "css-loader",
+          options: {
+            url: true,
+          }
+        }
+      ]
     },
     {
       test: /\.scss$/,
@@ -45,7 +53,8 @@ function serverConfig(env) {
 
   var APP_DIR = path.resolve(__dirname, './src');
 
-  var isnotBoomerang = (env.environment !== 'boomerang');
+  var isnotBoomerang = (env.environment !== 'boomerang' && env.environment !==
+    undefined);
 
   const server = {
     entry: {
@@ -54,10 +63,17 @@ function serverConfig(env) {
     target: 'node',
     output: {
       filename: '[name].js',
-      path: path.resolve(__dirname, 'dist')
+      path: path.resolve(__dirname, 'dist'),
+      strictModuleExceptionHandling: true
     },
     module: moduleObj,
-    externals: [nodeExternals(), 'electron']
+    externals: [nodeExternals(), 'electron'],
+    plugins: [
+      new webpack.DefinePlugin({
+        'process.env.NODE_ENV': JSON.stringify(env.environment ||
+          'production')
+      })
+    ]
   }
 
   if (isnotBoomerang) {
@@ -66,6 +82,12 @@ function serverConfig(env) {
     var serverPlugins = [];
     serverPlugins.push(
       new webpack.IgnorePlugin(/@boomerang/)
+    );
+    serverPlugins.push(
+      new webpack.IgnorePlugin({
+        resourceRegExp: /index\.js$/,
+        contextRegExp: /node_modules[\\/]facadeservice[\\/]dist[\\/]$/,
+      })
     );
     serverPlugins.push(
       new webpack.DefinePlugin({
@@ -89,10 +111,12 @@ function clientConfig(env) {
   const path = require(node_modules + '/path');
   const HtmlWebPackPlugin = require(node_modules + '/html-webpack-plugin');
   const CopyPlugin = require(node_modules + '/copy-webpack-plugin');
+  const webpack = require(node_modules + '/webpack');
 
   var APP_DIR = path.resolve(__dirname, './src');
 
-  var isnotBoomerang = (env.environment !== 'boomerang');
+  var isnotBoomerang = (env.environment !== 'boomerang' && env.environment !==
+    undefined);
 
   const client = {
     entry: {
@@ -101,7 +125,8 @@ function clientConfig(env) {
     target: 'web',
     output: {
       filename: '[name].js',
-      path: path.resolve(__dirname, 'dist/public')
+      path: path.resolve(__dirname, 'dist/public'),
+      strictModuleExceptionHandling: true
     },
     module: moduleObj,
     plugins: [
@@ -129,6 +154,21 @@ function clientConfig(env) {
       })
     );
     client['plugins'] = clientPlugins;
+  }
+
+  if (isnotBoomerang) {
+    console.log("NODE_ENV = " + env.environment);
+    console.log("NON boomerang env client config - ignoring @boomerang package");
+    var newClientPlugins = [];
+    newClientPlugins.push(
+      new webpack.IgnorePlugin(/@boomerang/)
+    );
+    newClientPlugins.push(
+      new HtmlWebPackPlugin({
+        template: APP_DIR + '/client/index.html',
+      })
+    );
+    client['plugins'] = newClientPlugins;
   }
 
   return client;

@@ -2,10 +2,14 @@ import React, { useState } from 'react'
 import NonBoomerangHeader from './index.js'
 import { withKnobs, text } from '@storybook/addon-knobs'
 import {Search20, Notification20, User20} from '@carbon/icons-react';
+import { useEffect } from 'react';
 export default { title: 'IAW App Header', decorators: [withKnobs]}
+import headerLogo from "../../assets/images/Agent-assist-logo.png";
 
 
 export const nonBoomerangHeader = (props) => {
+  const container = React.createRef();
+  const iconContainer = React.createRef();
   const [headerConfig, setHeaderConfig] = useState({});
   const [userDetail, setUserDetail] = useState({});
   const [headerPanel, setHeaderPanel] = useState(
@@ -50,17 +54,65 @@ export const nonBoomerangHeader = (props) => {
     {
       icon: <User20/>,
       ariaLabel: "User",
-      name: "User"
+      name: "User",
+      iconContainer: iconContainer
     }
   ];
+
+  const handleClickOutside = (event) => {
+    if (
+      container.current &&
+      !container.current.contains(event.target) && iconContainer.current &&
+      !iconContainer.current.contains(event.target)
+    ) {
+      let header = {...headerPanel};
+      header.expanded = false;
+      setHeaderPanel(header);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+  });
+
+  const sideNavItems = [
+    {
+      label: "Activities",
+      pathName: "https://www.google.com"
+    },
+    {
+      label: "Document Management",
+      pathName: "#",
+      renderIcon: Notification20
+    }
+  ]
+
+  const navigation = [
+    {
+      name: 'Menu 1',
+      url: 'https://www.google.com'
+    },
+    {
+      name: 'Menu 2',
+      url: 'https://www.facebook.com'
+    }
+  ]
 
   return <NonBoomerangHeader 
     customHeaderStyle={customHeaderStyle} 
     headerIcons={headerIcons} 
     onIconClick={onIconClick} 
-    productName="Corpus Curator"
+    productName="Automation Platform"
     logoLink="#" 
     headerPanel={headerPanel}
     onSwitcherItemClick={onSwitcherItemClick}
+    refContainer={container}
+    hasHeaderLogo={true}
+    headerLogo={headerLogo}
+    headerText="Agent Assist"
+    hasSideNav={true}
+    isSideNavOpen={true}
+    sideNavItems={sideNavItems}
+    navigation={navigation}
   />
 }
